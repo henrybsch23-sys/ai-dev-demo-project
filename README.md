@@ -1,88 +1,97 @@
 # AI-Dev Demo Project
 
-## Overview
-This repository is a **playground** for the Kolomolo Hackathon.  
-It is designed to simulate a natural software project where the **AI Developer Assistant** can:
-- Pick up GitHub Issues labeled `AI-Dev`
-- Propose a plan (as a comment)
-- Generate code & open Pull Requests
-- Wait for human-in-the-loop approval
+FastAPI-based demo API and sandbox adapter for experimenting with AI developer workflows.
 
-The AI logic and Temporal backend run in a **separate server repo**.  
-This repo is only for **demo issues, workflows, and simple features**.
+## 📦 Project Structure
 
----
-
-## Project Structure
 ```
-src/
-├── api/              # FastAPI app (REST endpoints)
-│   └── main.py
-├── services/         # Business logic (calculations, recommendations)
-│   ├── calculations.py
-│   └── recommendations.py
-├── workflows/        # Placeholder for orchestration/worker stubs
-│   ├── worker.py
-│   └── orchestrator.py
-└── tests/            # Unit tests (pytest)
-    ├── test_api.py
-    └── test_calculator.py
-
-docs/                 # Design notes and extra documentation
-.github/              # Issue template + GitHub Actions workflows
+.
+├─ app/                     # Main application package
+│  ├─ api/                  # FastAPI endpoints
+│  ├─ services/             # Pure functions for calculations & recommendations
+│  └─ tests/                # Unit & integration tests (pytest)
+│
+├─ adapters/                # Interfaces for Temporal team / AI workers
+│  ├─ http_server.py        # FastAPI service with /v1/plan and /v1/patch
+│  └─ cli.py                # Command-line adapter
+│
+├─ evaluator/               # Helpers for applying patches & running tests
+│  ├─ apply_patch.py
+│  ├─ run_tests.py
+│  ├─ score.py
+│
+├─ scenarios/               # JSON issue/task fixtures (S-001.json, …)
+├─ knowledge/CLAUDE.md      # Team conventions / house rules
+├─ artifacts/               # AI-generated plans, diffs, test reports
+├─ requirements.txt         # Python dependencies
+├─ .github/workflows/ci.yml # GitHub Actions CI (pytest)
+└─ README.md
 ```
 
----
+## 🚀 Getting Started
 
-## Quickstart (Local Development)
-**Requirements**: Python 3.11+, pip, virtualenv (or uv).
-
-Clone the repo:
-```bash
-git clone https://github.com/henrybsch23-sys/ai-dev-demo-project.git
-cd ai-dev-demo-project
-```
-
-Create virtual environment & install deps:
+### 1. Setup environment
 ```bash
 python -m venv .venv
-source .venv/bin/activate   # Linux/Mac
-.venv\Scripts\activate    # Windows
-
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-Run tests:
+### 2. Run API (main demo app)
+```bash
+uvicorn app.api.main:app --reload --port 8000
+```
+- Swagger UI: http://127.0.0.1:8000/docs  
+- Health check: http://127.0.0.1:8000/health
+
+### 3. Run Adapter (sandbox API)
+```bash
+uvicorn adapters.http_server:app --reload --port 8080
+```
+- Health check: http://127.0.0.1:8080/health  
+- Endpoints: `/v1/plan`, `/v1/patch`
+
+### 4. Run Tests
 ```bash
 pytest -q
 ```
 
-Run API locally:
+## 🧪 Example Usage
+
+### Plan creation (CLI)
 ```bash
-uvicorn src.api.main:app --reload
+python -m adapters.cli plan --issue-json scenarios/S-001.json
 ```
 
-Then open: http://127.0.0.1:8000/docs
+### Apply patch + score (CLI)
+```bash
+python -m adapters.cli apply --issue-id S-001 --patch diff.patch
+```
 
----
+### API call
+```bash
+curl "http://127.0.0.1:8000/tdee?bmr_val=1600&activity=sedentary"
+```
 
-## Demo Flow (AI-Dev)
-1. Create a GitHub **Issue** and label it `AI-Dev`.
-2. The AI Assistant proposes a **plan** (as a comment).
-3. Human approves the plan (add label `plan-approved`).
-4. AI generates code and opens a **Pull Request**.
-5. CI runs tests, then the team reviews & merges the PR.
+## 📂 Scenarios
 
----
+Sample issue/task specs live in `scenarios/`:
+```json
+{
+  "id": "S-001",
+  "title": "Reject unknown activity in /tdee with HTTP 400",
+  "acceptance": [
+    "GET /tdee?bmr_val=1600&activity=super-saiyan returns 400",
+    "GET /tdee?bmr_val=1600&activity=sedentary returns 200 with a number"
+  ]
+}
+```
 
-## Labels
-- `AI-Dev` → triggers the AI workflow.
-- `needs-approval` → waiting for human review.
-- `plan-approved` → human approved the plan.
+## ⚙️ CI/CD
 
----
+- GitHub Actions (`.github/workflows/ci.yml`) runs pytest on each push/PR
+- JUnit reports and artifacts saved under `artifacts/`
 
-## Notes
-- This repo is **not the Temporal backend**. It’s just a target project for Issues/PRs.
-- The AI Assistant connects here via **API keys** provided to the backend server.
-- The goal is to demonstrate **Issue → Plan → PR → Merge**.
+## 📜 License
+
+MIT – use freely for hackathons, demos, and experiments.
