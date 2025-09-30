@@ -1,0 +1,9 @@
+{
+  "id": "S-002",
+  "title": "Validate sex in /bmr endpoint",
+  "body": "Return 400 with message when sex not in {'male','female'}.",
+  "acceptance": [
+    "GET /bmr?sex=x&weight_kg=70&height_cm=175&age=30 returns 400"
+  ],
+  "repoFixture": "src"
+}

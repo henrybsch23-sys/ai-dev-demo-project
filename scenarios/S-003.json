@@ -1,0 +1,9 @@
+{
+  "id": "S-003",
+  "title": "Require hip_cm for female in /bodyfat",
+  "body": "For sex=female, missing or non-positive hip_cm returns 400.",
+  "acceptance": [
+    "GET /bodyfat?sex=female&height_cm=165&neck_cm=34&waist_cm=70 returns 400"
+  ],
+  "repoFixture": "src"
+}

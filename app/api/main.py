@@ -1,12 +1,12 @@
 from fastapi import FastAPI, HTTPException, Query
-from src.services.calculations import (
+from app.services.calculations import (
     bmi,
     bmr_mifflin_st_jeor,
     tdee,
     body_fat_navy,
     daily_water_intake_l,
 )
-from src.services.recommendations import simple_recommendations
+from app.services.recommendations import simple_recommendations
 
 app = FastAPI(title="AI-Dev Demo API", version="0.1.0")
 
@@ -36,7 +36,12 @@ def get_bmr(
 
 @app.get("/tdee")
 def get_tdee(bmr_val: float = Query(..., gt=0), activity: str = "sedentary"):
-    return {"tdee": tdee(bmr_val, activity)}
+    try:
+        return {"tdee": tdee(bmr_val, activity)}
+    except ValueError as e:
+        # calculations.tdee raises ValueError("unknown activity '...'")
+        # Map to HTTP 400 so your test passes.
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @app.get("/bodyfat")

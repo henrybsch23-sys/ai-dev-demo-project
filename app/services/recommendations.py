@@ -1,4 +1,4 @@
-from src.services.calculations import bmi, daily_water_intake_l
+from app.services.calculations import bmi, daily_water_intake_l
 
 
 def simple_recommendations(weight_kg: float, height_m: float, activity_hours: float = 0.0) -> list[str]:

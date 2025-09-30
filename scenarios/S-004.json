@@ -1,0 +1,9 @@
+{
+  "id": "S-004",
+  "title": "Reject negative activity hours in /water",
+  "body": "Return 400 if activity_hours < 0.",
+  "acceptance": [
+    "GET /water?weight_kg=70&activity_hours=-1 returns 400"
+  ],
+  "repoFixture": "src"
+}

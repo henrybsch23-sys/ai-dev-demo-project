@@ -1,0 +1,10 @@
+{
+  "id": "S-001",
+  "title": "Reject unknown activity in /tdee with HTTP 400",
+  "body": "Return 400 instead of 500 for invalid activity strings.",
+  "acceptance": [
+    "GET /tdee?bmr_val=1600&activity=super-saiyan returns 400",
+    "GET /tdee?bmr_val=1600&activity=sedentary returns 200 with a numeric 'tdee'"
+  ],
+  "repoFixture": "src"
+}

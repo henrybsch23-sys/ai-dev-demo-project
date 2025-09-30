@@ -1,0 +1,9 @@
+{
+  "id": "S-005",
+  "title": "Add recommendation for BMI under 16",
+  "body": "Strengthen advice when BMI < 16 to say 'severe underweight'.",
+  "acceptance": [
+    "GET /recommendations?weight_kg=40&height_m=1.80 returns a tip mentioning 'severe underweight'"
+  ],
+  "repoFixture": "src"
+}

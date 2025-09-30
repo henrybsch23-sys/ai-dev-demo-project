@@ -1,0 +1,9 @@
+{
+  "id": "S-006",
+  "title": "Include activity-specific hydration note",
+  "body": "When activity_hours > 2, add a tip like 'Long activity sessions require electrolyte replenishment'.",
+  "acceptance": [
+    "GET /recommendations?weight_kg=70&height_m=1.75&activity_hours=3 returns a tip mentioning 'electrolyte'"
+  ],
+  "repoFixture": "src"
+}

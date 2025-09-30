@@ -1,3 +1,17 @@
-fastapi==0.115.0
-uvicorn[standard]==0.30.6
-pytest==8.3.3
+# Web API
+fastapi==0.115.*          # your main API framework
+uvicorn[standard]==0.30.* # dev server (both main API and adapter)
+
+# Data validation
+pydantic==2.9.*
+
+# Testing
+pytest==8.*
+
+# Useful runtime/test deps
+httpx==0.27.*             # FastAPI TestClient depends on this
+requests==2.*             # handy for quick local scripts
+
+# (Optional quality tools—uncomment if you want them in CI)
+# ruff==0.6.*
+# mypy==1.11.*

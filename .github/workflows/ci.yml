@@ -1,14 +1,67 @@
-name: Python tests
+name: ci
+
 on:
+  push:
+    branches: [ "**" ]
   pull_request:
-    branches: [ main ]
+    branches: [ "**" ]
+
+# Cancel older runs on the same branch/PR to save minutes
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
+    name: Python tests
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11"]
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-      - run: pip install -r requirements.txt
-      - run: pytest -q
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+          cache-dependency-path: |
+            requirements.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # Optional: prove imports work from project root
+      - name: Print sys.path (debug)
+        run: python - <<'PY'
+import sys, os
+print("PYTHONPATH:", os.environ.get("PYTHONPATH"))
+print("sys.path:", sys.path)
+PY
+
+      - name: Run tests
+        env:
+          # If your imports are like "from app.services ..." keep as "."
+          # If they're like "from src.services ...", set PYTHONPATH to project root too.
+          PYTHONPATH: .
+        run: |
+          mkdir -p artifacts/ci
+          pytest -q --junitxml=artifacts/ci/junit.xml
+
+      - name: Upload test reports (always)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-and-logs
+          path: |
+            artifacts/ci/junit.xml
+            .pytest_cache/**/*
+          if-no-files-found: ignore
