@@ -39,8 +39,8 @@ docs/                 # Design notes and extra documentation
 
 Clone the repo:
 ```bash
-git clone https://github.com/<your-org>/<your-repo>.git
-cd <your-repo>
+git clone https://github.com/henrybsch23-sys/ai-dev-demo-project.git
+cd ai-dev-demo-project
 ```
 
 Create virtual environment & install deps:
